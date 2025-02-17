@@ -1,0 +1,601 @@
+﻿<Window x:Class="Guenji_Care.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:fa5="http://schemas.fontawesome.com/icons/"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Guenji Care" Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#508B0034"
+        AllowsTransparency="True" WindowStyle="None"
+        ResizeMode="NoResize">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CornerRadius="50" GlassFrameThickness="0" ResizeBorderThickness="5" CaptionHeight="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid>
+        <!-- Overlay für abgerundete Ecken -->
+        <Border Background="#CC8B0034" CornerRadius="20">
+            <Grid>
+                <!-- Layout in zwei Spalten -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Header mit Schließen- und Minimieren-Buttons -->
+                <DockPanel Background="#998B0034" Height="13" VerticalAlignment="Top" Grid.ColumnSpan="2">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,-30">
+                        <!-- Minimieren-Button -->
+                        <Button Content="−" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" Foreground="White"
+                                Click="MinimizeButton_Click" Background="Transparent" BorderThickness="0" Padding="8,0"
+                                Width="30" Height="30" Margin="0,0,5,0" PreviewMouseDown="Button_PreviewMouseDown"/>
+                        <!-- Schließen-Button -->
+                        <Button Content="✕" FontFamily="Segoe UI" FontSize="16" FontWeight="Bold" Foreground="White"
+                                Click="CloseButton_Click" Background="Transparent" BorderThickness="0" Padding="8,0"
+                                Width="30" Height="30" Margin="0,0,5,0" PreviewMouseDown="Button_PreviewMouseDown"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- Linke Seite: Benutzeranzeige und Login -->
+                <Border Grid.Column="0" Background="#998B0034" Padding="20" CornerRadius="15" Margin="10,18,10,10">
+                    <StackPanel Margin="0,0,0,-17">
+                        <!-- Logo -->
+                        <Image Source="pack://application:,,,/Images/logo4.png" Width="344" Height="258" Margin="0,0,10,20" HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="" 
+                                   FontSize="16" 
+                                   Foreground="#360115" 
+                                   Margin="0,79,0,20" 
+                                   HorizontalAlignment="Center" 
+                                   FontWeight="Bold"/>
+
+                        <!-- Standortauswahl -->
+                        <TextBlock Text="Standort:" FontSize="16" Foreground="#360115" Margin="0,0,0,10" FontWeight="Bold"/>
+                        <ComboBox x:Name="StandortDropdown" IsEnabled="False" Height="40" FontSize="16" FontWeight="Bold" Background="#FFA54F" Foreground="#360115"
+                                  VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
+
+                        <!-- Benutzername -->
+                        <TextBlock Text="Benutzername:" FontSize="16" Foreground="#360115" Margin="0,20,0,10" FontWeight="Bold"/>
+                        <TextBox x:Name="UsernameTextBox" Height="40" FontSize="16" Background="White" FontWeight="Bold" Foreground="#360115"
+                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
+
+                        <!-- Passwort -->
+                        <TextBlock Text="Passwort:" FontSize="16" Foreground="#360115" Margin="0,20,0,10" FontWeight="Bold"/>
+                        <PasswordBox x:Name="PasswordBox" Height="40" FontSize="16" Background="White" FontWeight="Bold" Foreground="#360115"
+                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Left">
+                            <PasswordBox.Template>
+                                <ControlTemplate TargetType="PasswordBox">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0">
+                                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </PasswordBox.Template>
+                        </PasswordBox>
+                        <Button x:Name="LoginButton" Content="Login" Width="240" Height="70" IsEnabled="True" Margin="0,20,0,0" FontSize="16" Foreground="#360115" FontWeight="Bold" Click="LoginButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="ButtonBorder" Background="#a3023e" CornerRadius="15">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ColorAnimation Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                                                    To="#FFA54F" Duration="0:0:0.3"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ColorAnimation Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                                                                    To="#8B0034" Duration="0:0:0.3"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Rechte Seite: Icons für Funktionen mit WrapPanel -->
+                <WrapPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Orientation="Horizontal" Height="680" Width="856" Margin="0,120,0,0">
+                    <!-- Bestehende Buttons -->
+                    <Button x:Name="DienstplanButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Dienstplan" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="DokumentationButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Dokumentation" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="MedikamenteButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Medikamente" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="PatientenButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Patienten" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="AbrechnungButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Abrechnung" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="AdministratorButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Administrator" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <!-- Funktion 1 -->
+                    <Button x:Name="BetreuungButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Betreuung" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Funktion 2 -->
+                    <Button x:Name="MitarbeiterButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Mitarbeiter" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Funktion 3 -->
+                    <Button x:Name="LeistungsnachweisButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Leistungsnachweis" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Funktion 4 -->
+                    <Button x:Name="VerordnungenButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Verordnungen" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Funktion 5 -->
+                    <Button x:Name="FirmenButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Firmen" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Funktion 6 -->
+                    <Button x:Name="ÜbergabebuchButton" Width="250" Height="70" IsEnabled="False" Margin="0,0,20,90" FontSize="16" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <!-- StackPanel für Icon und Text -->
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- FontAwesome-Icon -->
+                                        <fa5:ImageAwesome Icon="Solid_Calendar" Width="30" Height="30" Foreground="Black" Margin="0,0,0,5"/>
+                                        <!-- Text -->
+                                        <TextBlock Text="Übergabebuch" FontSize="16" Foreground="Black" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+                                                Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <Button x:Name="EinstellungenButton" Content="Einstellungen" Width="250" Height="70" IsEnabled="False" Margin="0,-50,20,90" FontSize="16" Foreground="#360115" FontWeight="Bold">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="ButtonBorder" Background="#8B0034" CornerRadius="15">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Trigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <!-- Änderung hier: Direkte Animation des SolidColorBrush -->
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+																	Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+																	To="#a3023e" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.EnterActions>
+                                        <Trigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetName="ButtonBorder"
+																	Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+																	To="#8B0034" Duration="0:0:0.3"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </Trigger.ExitActions>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                </WrapPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
